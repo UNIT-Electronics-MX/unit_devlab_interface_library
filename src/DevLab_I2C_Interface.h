@@ -7,6 +7,11 @@
   bytes. Device-specific quirks (e.g. leading dummy bytes some chips
   return) belong to the sensor driver, not here.
 
+  7-bit addressing only. For 10-bit addressed devices, use
+  DevLab_I2C10_Interface instead - address framing differs enough
+  between the two that keeping them as separate classes avoids a
+  runtime branch on every transaction.
+
   Organization:
   UNIT Electronics - DevLab Ecosystem
 
@@ -23,8 +28,9 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "DevLab_BusIO.h"
+#include "DevLab_I2C_Common.h"
 
-class DevLab_I2C_Interface : public DevLab_BusIO<DevLab_I2C_Interface> {
+class DevLab_I2C_Interface : public DevLab_BusIO<DevLab_I2C_Interface>, protected DevLab_I2C_Common {
 public:
     // readDummyBytes: some chips (e.g. Bosch BMI323) prepend N filler
     // bytes to every register read before the real payload. Set it once
@@ -49,10 +55,7 @@ public:
     bool getWhoAmI(uint8_t reg, uint8_t &whoAmI);
 
 private:
-    TwoWire *_wire;
     uint8_t _address;
-    uint32_t _clock;
-    uint8_t _readDummyBytes;
 };
 
 #endif // DEVLAB_I2C_INTERFACE_H
