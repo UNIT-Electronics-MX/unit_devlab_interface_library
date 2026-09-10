@@ -32,6 +32,13 @@ protected:
     bool beginCommon(uint8_t sdaPin, uint8_t sclPin);
     void setClockCommon(uint32_t clock);
 
+
+    bool devlabWaitForI2CLineHigh(uint8_t pin, uint32_t timeoutUs);
+    bool devlabClearI2CBus(uint8_t sdaPin, uint8_t sclPin, uint32_t timeoutUs);
+    bool devlabBeginI2CBusRecovered(uint8_t sdaPin, uint8_t sclPin,
+    uint32_t frequency, uint32_t timeoutUs, bool restart = false);
+
+
     TwoWire *_wire;
     uint32_t _clock;
     uint8_t _readDummyBytes;

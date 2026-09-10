@@ -25,6 +25,10 @@ bool DevLab_I2C_Orchestrator::begin(uint8_t sdaPin, uint8_t sclPin) {
     return beginCommon(sdaPin, sclPin);
 }
 
+bool DevLab_I2C_Orchestrator::beginRecovered(uint8_t sdaPin, uint8_t sclPin, uint32_t timeoutUs, bool restart) {
+    return devlabBeginI2CBusRecovered(sdaPin, sclPin, _clock, timeoutUs, restart);
+}
+
 void DevLab_I2C_Orchestrator::setClock(uint32_t clock) {
     setClockCommon(clock);
 }

@@ -44,6 +44,12 @@ public:
 
 
     bool begin(uint8_t sdaPin, uint8_t sclPin);
+
+    // Same as begin(sdaPin, sclPin), but first drives SCL/SDA to clock a
+    // stuck slave off the bus (see DevLab_I2C_Common::devlabBeginI2CBusRecovered).
+    // Use when a device may have been left mid-transaction (e.g. after a reset).
+    bool beginRecovered(uint8_t sdaPin, uint8_t sclPin, uint32_t timeoutUs = 20000, bool restart = false);
+
     bool ping(uint8_t address);
     bool writeCommand(uint8_t address, uint8_t command);
     bool transact(uint8_t address, uint8_t command, uint8_t *data, size_t len, uint16_t delayMs = 0);
