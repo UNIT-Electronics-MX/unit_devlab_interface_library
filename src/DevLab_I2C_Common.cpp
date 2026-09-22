@@ -36,6 +36,11 @@ bool DevLab_I2C_Common::beginCommon(uint8_t sdaPin, uint8_t sclPin) {
     _wire->begin();
 #elif defined(ARDUINO_ARCH_ESP32)
     _wire->begin(sdaPin, sclPin, _clock);
+#elif defined(ARDUINO_ARCH_STM32)
+    // STM32duino: TwoWire::begin(sda, scl) sets the pins directly.
+    _wire->setSDA(sdaPin);
+    _wire->setSCL(sclPin);
+    _wire->begin();
 #else
     (void)sdaPin;
     (void)sclPin;
