@@ -161,13 +161,15 @@ unit_devlab_interface_library/
 | Parameter | Value |
 |---|---|
 | Library Name | DevLab_Interface |
-| Version | 1.0.0 |
+| Version | 1.1.2 |
 | Communication | I2C (SPI planned) |
 | Architecture | Cross-platform |
 
 ---
 
 ## Author
+
+Jonathan Mejorado
 
 UNIT Electronics - DevLab Ecosystem
 
