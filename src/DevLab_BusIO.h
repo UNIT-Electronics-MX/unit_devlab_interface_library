@@ -35,6 +35,12 @@
 
 #include <Arduino.h>
 
+// Unsigned mask of `len` low bits; handles the full 32-bit width, where
+// (1 << len) would be undefined behavior.
+static inline uint32_t devlabBitMask(uint8_t len) {
+    return (len >= 32) ? 0xFFFFFFFFUL : ((1UL << len) - 1UL);
+}
+
 template <typename Derived>
 
 class DevLab_BusIO {
@@ -98,24 +104,51 @@ public:
         return true;
     }
 
+    // Big-endian (MSB first) 16-bit helpers, for chips such as MPU6050,
+    // INA219 or ADS1115. The little-endian readRegister16/writeRegister16
+    // above are unchanged.
+    bool writeRegister16BE(uint8_t reg, uint16_t value) {
+        uint8_t buf[2] = {
+            (uint8_t)((value >> 8) & 0xFF),
+            (uint8_t)(value & 0xFF)
+        };
+        return writeBytes(reg, buf, 2);
+    }
+
+    bool readRegister16BE(uint8_t reg, uint16_t &value) {
+        uint8_t buf[2];
+        if (!readBytes(reg, buf, 2)) return false;
+        value = ((uint16_t)buf[0] << 8) | (uint16_t)buf[1];
+        return true;
+    }
+
+    // Read-modify-write of a bit field inside an 8-bit register.
+    bool writeBits(uint8_t reg, uint8_t pos, uint8_t len, uint8_t value){
+        uint8_t buf;
+        if (!readBytes(reg, &buf, 1)) return false;
+        uint8_t mask = (uint8_t)((((uint16_t)1 << len) - 1) << pos);
+        buf = (uint8_t)((buf & ~mask) | ((value << pos) & mask));
+        return writeBytes(reg, &buf, 1);
+    }
+
     bool readBits(uint8_t reg, uint8_t pos, uint8_t len, uint8_t &value){
         uint8_t buf;
         if (!readBytes(reg, &buf, 1)) return false;
-        value = (buf >> pos) & ((1 << len) - 1);
+        value = (buf >> pos) & devlabBitMask(len);
         return true;
     }
 
     bool readBits16(uint8_t reg, uint8_t pos, uint8_t len, uint16_t &value){
         uint16_t buf;
         if (!readRegister16(reg, buf)) return false;
-        value = (buf >> pos) & ((1 << len) - 1);
+        value = (buf >> pos) & devlabBitMask(len);
         return true;
     }
 
     bool readBits32(uint8_t reg, uint8_t pos, uint8_t len, uint32_t &value){
         uint32_t buf;
         if (!readRegister32(reg, buf)) return false;
-        value = (buf >> pos) & ((1 << len) - 1);
+        value = (buf >> pos) & devlabBitMask(len);
         return true;
     }
 protected:
