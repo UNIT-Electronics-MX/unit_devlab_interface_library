@@ -19,6 +19,9 @@
   Organization:
   UNIT Electronics - DevLab Ecosystem
 
+  Author: 
+  Jonathan Mejorado Lopez
+
   License:
   MIT License
 */
